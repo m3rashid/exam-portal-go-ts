@@ -5,25 +5,18 @@ import { ConfigProvider, Layout, Menu, theme as antdTheme } from "antd";
 
 import theme from "./theme";
 import { authState } from "../atoms/auth";
-import { adminItems, defaultItems, trainerItems } from "./sidebarItems";
+import { getItems } from "./sidebarItems";
 
 interface IProps extends PropsWithChildren {}
 
 const RootWrapper: FC<IProps> = ({ children }) => {
   const { userType } = useRecoilValue(authState);
   const [collapsed, setCollapsed] = useState(false);
+
   const {
     token: { colorBgContainer },
   } = antdTheme.useToken();
-
-  const sidebarItems =
-    userType === "ADMIN"
-      ? adminItems
-      : userType === "TRAINER"
-      ? trainerItems
-      : userType === "TRAINEE"
-      ? trainerItems
-      : defaultItems;
+  const sidebarItems = getItems(userType);
 
   return (
     <ConfigProvider theme={theme}>

@@ -25,7 +25,7 @@ const (
 	NOT_FOUND = 1
 )
 
-func Result(err error) SearchResult {
+func Results(err error) SearchResult {
 	var status int
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

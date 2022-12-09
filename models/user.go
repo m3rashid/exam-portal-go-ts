@@ -22,7 +22,10 @@ type User struct {
 	Password string `gorm:"not null"`
 	Name     string
 	Role     string `gorm:"default:'TRAINEE'"` // TRAINEE, TRAINER, ADMIN, SUPER_ADMIN
-
+	Contact  string
+	Avatar   string
+	Location string
+	Tests    []int `gorm:"type:integer[]"` // array of test ids
 }
 
 func FindUserByEmail(email string) (*User, SearchResult) {
