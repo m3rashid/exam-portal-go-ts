@@ -8,12 +8,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/judwhite/go-svc/svc"
+	"github.com/judwhite/go-svc"
 	"github.com/m3rashid/exam-portal/models"
-	"github.com/m3rashid/exam-portal/uitls/args"
+	"github.com/m3rashid/exam-portal/routers"
+	"github.com/m3rashid/exam-portal/utils/args"
 	"github.com/m3rashid/exam-portal/utils/db"
 	"github.com/m3rashid/exam-portal/utils/redis"
-	"github.com/m3rashid/exam-portal/utils/routers"
 )
 
 type program struct {

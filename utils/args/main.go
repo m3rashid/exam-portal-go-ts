@@ -3,6 +3,7 @@ package args
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"io"
 
 	"github.com/gin-gonic/gin"
@@ -37,4 +38,19 @@ func Params(c *gin.Context) map[string]string {
 		sec[k] = v[0]
 	}
 	return sec
+}
+
+type CmdArgs struct {
+	DB      string
+	GIN_ENV string
+	TABLE   string
+}
+
+var Cmd CmdArgs
+
+func ParseCmd() {
+	flag.StringVar(&Cmd.DB, "db", "", "db operation")
+	flag.StringVar(&Cmd.GIN_ENV, "env", "development", "gin environment")
+	flag.StringVar(&Cmd.TABLE, "table", "", "table name")
+	flag.Parse()
 }
