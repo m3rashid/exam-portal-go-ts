@@ -1,4 +1,8 @@
-import {} from "@ant-design/icons";
+import {
+  UploadOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
 import { MenuProps } from "antd";
 
 import { UserType } from "../atoms/auth";
@@ -15,6 +19,24 @@ export const defaultItems: SidebarItems = [];
 
 export const superAdminItems: SidebarItems = [];
 
+const testSidebaritems: SidebarItems = [
+  {
+    key: "1",
+    icon: <UserOutlined />,
+    label: "nav 1",
+  },
+  {
+    key: "2",
+    icon: <VideoCameraOutlined />,
+    label: "nav 2",
+  },
+  {
+    key: "3",
+    icon: <UploadOutlined />,
+    label: "nav 3",
+  },
+];
+
 export const getItems = (userType: UserType | null): SidebarItems => {
   switch (userType) {
     case "TRAINER":
@@ -26,6 +48,6 @@ export const getItems = (userType: UserType | null): SidebarItems => {
     case "SUPER_ADMIN":
       return superAdminItems;
     default:
-      return defaultItems;
+      return process.env.NODE_ENV === "development" ? testSidebaritems : [];
   }
 };

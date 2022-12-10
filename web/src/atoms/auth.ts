@@ -1,6 +1,13 @@
 import { atom } from "recoil";
 
-export type UserType = "TRAINEE" | "TRAINER" | "ADMIN" | "SUPER_ADMIN";
+export const UserRoles = [
+  "TRAINEE",
+  "TRAINER",
+  "ADMIN",
+  "SUPER_ADMIN",
+] as const;
+
+export type UserType = typeof UserRoles[number];
 
 export interface AuthState {
   isAuthenticated: boolean;
