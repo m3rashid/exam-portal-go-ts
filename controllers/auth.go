@@ -30,7 +30,7 @@ func Login(c *gin.Context) {
 
 	user, err := models.FindUserByEmail(reqBody.Email)
 	if err {
-		c.JSON(http.StatusInternalServerError, gin.H{"status": "Internal server errror"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "User does not exists"})
 		return
 	}
 
@@ -60,9 +60,19 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	if reqBody.Password != reqBody.ConfirmPassword {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "password and password confirmation does not match"})
+		return
+	}
+
+	if !helpers.Contains(models.UserRoleTypeValues, reqBody.Role) {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "Invalid role"})
+		return
+	}
+
 	user, err := models.FindUserByEmail(reqBody.Email)
 	if !err {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "A user already exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "A user already exists with same credentials"})
 		return
 	}
 
@@ -81,7 +91,7 @@ func Register(c *gin.Context) {
 		Avatar:   reqBody.Avatar,
 		Active:   true,
 		Password: string(hash),
-	})
+	}).First(&user)
 
 	payload := jwt.GenPayload(user.Role, user.ID.String())
 	jwt.RevokeLastJwt(payload)
@@ -91,7 +101,7 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "User created successfully",
 		"token":  token,
-		"user":   user,
+		"user":   &user,
 	})
 }
 

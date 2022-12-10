@@ -13,3 +13,7 @@ func PingHandler(c *gin.Context) {
 func RootRouter(c *gin.Context) {
 	c.String(http.StatusOK, "Hello World")
 }
+
+func Favicon(c *gin.Context) {
+	c.Status(http.StatusNoContent)
+}

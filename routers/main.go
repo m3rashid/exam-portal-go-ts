@@ -47,6 +47,7 @@ func SetupRouter() *gin.Engine {
 	// general
 	router.GET("/", controllers.RootRouter)
 	router.GET("/ping", controllers.PingHandler)
+	router.GET("/favicon.ico", controllers.Favicon)
 
 	// auth
 	auth.POST("/login", controllers.Login)
