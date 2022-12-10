@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,6 +13,67 @@ import (
 	"github.com/m3rashid/exam-portal/utils/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func Login(c *gin.Context) {
+	var reqBody params.LogIn
+	var user *models.User
+
+	if err := c.ShouldBind(&reqBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := models.FindUserByEmail(reqBody.Email)
+	if err {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": "Internal server errror"})
+		return
+	}
+
+	if !user.Active {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "User does not exists"}) // deleted user
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "Logged in Successfully",
+		// TODO: fix this
+		"token": jwt.Encoder(jwt.GenPayload("", "", user.ID.String())),
+		"user":  user,
+	})
+}
+
+func Register(c *gin.Context) {
+	var reqBody params.Register
+	var user *models.User
+
+	if err := c.ShouldBind(&reqBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := models.FindUserByEmail(reqBody.Email)
+	if !err {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "A user already exists"})
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(reqBody.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	db.DB.Model(&user).Create(&models.User{
+		Email:    reqBody.Email,
+		Name:     reqBody.Name,
+		Contact:  reqBody.Contact,
+		Location: reqBody.Location,
+		Role:     reqBody.Role,
+		Avatar:   reqBody.Avatar,
+		Active:   true,
+		Password: hash,
+	})
+}
 
 func CurrentUser(c *gin.Context) *models.User {
 	sub, _ := c.Get("sub")
@@ -28,7 +88,6 @@ func AuthPingHandler(c *gin.Context) {
 func ChangePasswordInitHandler(c *gin.Context) {
 	var change params.ChangePasswordInit
 	var user *models.User
-	var res models.SearchResult
 
 	if err := c.ShouldBind(&change); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -36,14 +95,8 @@ func ChangePasswordInitHandler(c *gin.Context) {
 	}
 
 	user, err := models.FindUserByEmail(change.Email)
-
 	if err {
-		if res.Status == models.NOT_FOUND {
-			c.JSON(http.StatusBadRequest, gin.H{"status": "User not found"})
-		} else if res.Status == models.ERROR {
-			c.JSON(http.StatusInternalServerError, gin.H{"status": "Internal server errror"})
-		}
-		fmt.Println(res.Error)
+		c.JSON(http.StatusBadRequest, gin.H{"status": "User not found"})
 		return
 	}
 

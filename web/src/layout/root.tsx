@@ -1,7 +1,13 @@
+import {
+  ConfigProvider,
+  Layout,
+  Menu,
+  theme as antdTheme,
+  Typography,
+} from "antd";
 import { MenuUnfoldOutlined } from "@ant-design/icons";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { FC, PropsWithChildren, useEffect } from "react";
-import { ConfigProvider, Layout, Menu, theme as antdTheme } from "antd";
 
 import theme from "./theme";
 import { uiState } from "../atoms/ui";
@@ -16,7 +22,11 @@ const RootWrapper: FC<IProps> = ({ children }) => {
   const [ui, setUi] = useRecoilState(uiState);
 
   useEffect(() => {
-    window.localStorage.setItem(localStorageKeys.ui, JSON.stringify(ui));
+    const timeout = setTimeout(() => {
+      window.localStorage.setItem(localStorageKeys.ui, JSON.stringify(ui));
+    }, 0);
+
+    return () => clearTimeout(timeout);
   }, [ui]);
 
   const {
@@ -36,14 +46,25 @@ const RootWrapper: FC<IProps> = ({ children }) => {
             height: "100%",
             display: "flex",
             overflowY: "auto",
+            overflowX: "hidden",
           }}
         >
-          <MenuUnfoldOutlined
+          <div
+            style={{
+              height: 64,
+              display: "flex",
+              width: "100%",
+              cursor: "pointer",
+              background: "#f5f5f5",
+              marginBottom: 10,
+              borderBottomRightRadius: 8,
+            }}
             onClick={() =>
               setUi((prev) => ({ ...prev, sidebarOpen: !prev.sidebarOpen }))
             }
-            style={{ fontSize: 24, padding: 20 }}
-          />
+          >
+            <MenuUnfoldOutlined style={{ fontSize: 24, margin: "auto" }} />
+          </div>
 
           <Menu
             theme="light"
@@ -52,16 +73,27 @@ const RootWrapper: FC<IProps> = ({ children }) => {
             items={sidebarItems}
             style={{
               background: "#f5f5f5",
-              height: "calc(100% - 64px)",
+              height: "calc(100% - 74px)",
               width: ui.sidebarOpen ? 190 : 70,
               borderTopRightRadius: 8,
               border: 0,
+              flex: 1,
             }}
           />
         </Layout.Sider>
         <Layout style={{ background: colorBgContainer }}>
           <Layout.Header style={{ padding: 0, background: colorBgContainer }}>
-            {/* header things here */}
+            <Typography.Title
+              level={3}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                height: "100%",
+                marginLeft: 16,
+              }}
+            >
+              Exam Portal
+            </Typography.Title>
           </Layout.Header>
           <div
             style={{
@@ -71,6 +103,7 @@ const RootWrapper: FC<IProps> = ({ children }) => {
               borderTopLeftRadius: 8,
               borderTopRightRadius: 8,
               marginRight: 12,
+              marginTop: 10,
             }}
           >
             <Layout.Content

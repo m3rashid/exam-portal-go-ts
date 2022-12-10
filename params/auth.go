@@ -4,6 +4,11 @@ type Register struct {
 	Email           string `form:"email" json:"email" xml:"email" binding:"required"`
 	Password        string `form:"password" json:"password" xml:"password" binding:"required"`
 	ConfirmPassword string `form:"confirmPassword" json:"confirmPassword" xml:"confirmPassword" binding:"required"`
+	Name            string `form:"name" json:"name" xml:"name" binding:"required"`
+	Contact         string `form:"contact" json:"contact" xml:"contact"`
+	Avatar          string `form:"avatar" json:"avatar" xml:"avatar"`
+	Location        string `form:"location" json:"location" xml:"location"`
+	Role            string `form:"role" json:"role" xml:"role"`
 }
 
 type LogIn struct {

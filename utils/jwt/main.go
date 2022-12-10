@@ -53,6 +53,7 @@ func RevokeLastJwt(payload Payload) {
 		if err != nil {
 			exp = time.Now().Unix()
 		}
+
 		payload.Id = jti
 		payload.IssuedAt = time.Now().Unix()
 		payload.ExpiresAt = exp
@@ -62,7 +63,7 @@ func RevokeLastJwt(payload Payload) {
 
 func OnJwtDispatch(payload Payload) {
 	RevokeLastJwt(payload)
-	redis.SetEx(fmt.Sprintf("user_jwt:%s", payload.Subject), fmt.Sprintf("%s:%d", payload.Id, payload.ExpiresAt), time.Unix(payload.ExpiresAt, 0).Sub(time.Now()))
+	redis.SetEx(fmt.Sprintf("user_jwt:%s", payload.Subject), fmt.Sprintf("%s:%d", payload.Id, payload.ExpiresAt), time.Until(time.Unix(payload.ExpiresAt, 0)))
 }
 
 func Encoder(payload Payload) string {
@@ -79,8 +80,10 @@ func Decoder(tokenString string) (string, string, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
+
 		return []byte(viper.Get("DEVISE_JWT_SECRET_KEY").(string)), nil
 	})
+
 	if err != nil {
 		return "", "", err
 	}

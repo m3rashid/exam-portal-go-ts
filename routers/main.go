@@ -27,7 +27,6 @@ func InitRouter(sig ...os.Signal) {
 }
 
 func SetupRouter() *gin.Engine {
-	//防止前端跨域请求失败
 	router := gin.Default()
 	config := cors.DefaultConfig()
 	config.ExposeHeaders = []string{"Authorization"}

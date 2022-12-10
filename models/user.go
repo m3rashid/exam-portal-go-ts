@@ -20,7 +20,7 @@ var UserRoleTypeValues = []string{TRAINEE, TRAINER, ADMIN, SUPER_ADMIN}
 
 type User struct {
 	Model
-	Email    string `gorm:"uniqueIndex;not null"`
+	Email    string `gorm:"uniqueIndex; not null"`
 	Password string `gorm:"not null"`
 	Name     string
 	Role     string `gorm:"default:'TRAINEE'"` // TRAINEE, TRAINER, ADMIN, SUPER_ADMIN
