@@ -15,16 +15,14 @@ import (
 )
 
 type Payload struct {
-	Device string `json:"device,omitempty"`
-	Scp    string `json:"scp,omitempty"`
+	Scope string `json:"scope,omitempty"`
 	jwt.StandardClaims
 }
 
-func GenPayload(device, scp, sub string) Payload {
+func GenPayload(scope, sub string) Payload {
 	now := time.Now()
 	return Payload{
-		Device: device,
-		Scp:    scp,
+		Scope: scope,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: now.Add(1 * time.Hour).Unix(),
 			Id:        uuid.New().String(),
@@ -68,7 +66,7 @@ func OnJwtDispatch(payload Payload) {
 
 func Encoder(payload Payload) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
-	tokenString, err := token.SignedString([]byte(config.GetEnv("DEVISE_JWT_SECRET_KEY")))
+	tokenString, err := token.SignedString([]byte(config.GetEnv("JWT_SECRET_KEY")))
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -81,7 +79,7 @@ func Decoder(tokenString string) (string, string, error) {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(viper.Get("DEVISE_JWT_SECRET_KEY").(string)), nil
+		return []byte(viper.Get("JWT_SECRET_KEY").(string)), nil
 	})
 
 	if err != nil {
@@ -90,9 +88,9 @@ func Decoder(tokenString string) (string, string, error) {
 
 	if payload, ok := token.Claims.(*Payload); ok && token.Valid {
 		sub := (*payload).Subject
-		scp := (*payload).Scp
-		if sub != "" && !JwtRevoked(*payload) && scp != "" {
-			return sub, scp, nil
+		scope := (*payload).Scope
+		if sub != "" && !JwtRevoked(*payload) && scope != "" {
+			return sub, scope, nil
 		}
 	}
 

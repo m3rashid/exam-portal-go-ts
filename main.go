@@ -14,6 +14,7 @@ import (
 	"github.com/m3rashid/exam-portal/utils/args"
 	"github.com/m3rashid/exam-portal/utils/db"
 	"github.com/m3rashid/exam-portal/utils/redis"
+	"github.com/spf13/viper"
 )
 
 type program struct {
@@ -65,6 +66,7 @@ func (p *program) Stop() error {
 }
 
 func main() {
+	fmt.Println(viper.Get("HTTP_PORT"))
 	prg := &program{}
 	if err := svc.Run(prg, os.Interrupt); err != nil {
 		log.Fatal(err)

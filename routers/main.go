@@ -8,6 +8,9 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/m3rashid/exam-portal/controllers"
+	"github.com/m3rashid/exam-portal/middlewares"
+	"github.com/m3rashid/exam-portal/models"
 	"github.com/m3rashid/exam-portal/utils/config"
 )
 
@@ -35,27 +38,46 @@ func SetupRouter() *gin.Engine {
 	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
 	router.Use(cors.New(config))
 
-	// router.GET("/ping", service.PingHandler)
-	// router.POST("/sms", service.SMSHandler)
-	// router.POST("/users", service.CreateUsersHandler)
-	// router.POST("/alipay", service.AliPayHandler)
-	// router.POST("/alipay_notify", service.AliPayNotifyHandler)
-	// router.POST("/cities", service.CityListHandler)
-	// router.POST("/influx_save", service.SaveInfluxDBHandler)
-	// router.POST("/influx_show", service.ShowInfuxDBHandler)
-	// authorized := router.Group("/")
-	// authorized.Use(middleware.Auth("user"))
-	// {
-	// 	authorized.GET("/auth_ping", service.AuthPingHandler)
-	// }
-	// users := router.Group("/users")
-	// {
-	// 	users.POST("/sign_up", service.SignUpHandler)
-	// 	users.POST("/sign_in", service.SignInHandler)
-	// }
-	// users.Use(middleware.Auth("user"))
-	// {
-	// 	users.POST("/change_password", service.ChangePasswordHandler)
-	// }
+	auth := router.Group("/auth")              // auth required for all
+	trainee := router.Group("/trainee")        // auth required for trainee
+	trainer := router.Group("/trainer")        // auth required for trainer
+	admin := router.Group("/admin")            // auth required for admin
+	superAdmin := router.Group("/super-admin") // auth required for superAdmin
+
+	// general
+	router.GET("/", controllers.RootRouter)
+	router.GET("/ping", controllers.PingHandler)
+
+	// auth
+	auth.POST("/login", controllers.Login)
+	auth.POST("/register", controllers.Register)
+	auth.POST("/forgot-password", controllers.ChangePasswordInitHandler)
+	auth.POST("/reset-password", controllers.ChangePasswordFinalHandler)
+	auth.Use(middlewares.Auth(models.UserRoleTypeValues))
+	{
+		auth.POST("/logout", controllers.Logout)
+		auth.POST("/revalidate", controllers.Revalidate)
+	}
+
+	// trainee only
+	trainee.Use(middlewares.Auth([]string{models.TRAINEE}))
+	{
+	}
+
+	// trainer only
+	trainer.Use(middlewares.Auth([]string{models.TRAINER}))
+	{
+	}
+
+	// admin only
+	admin.Use(middlewares.Auth([]string{models.ADMIN}))
+	{
+	}
+
+	// superAdmin only
+	superAdmin.Use(middlewares.Auth([]string{models.SUPER_ADMIN}))
+	{
+	}
+
 	return router
 }

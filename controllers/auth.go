@@ -7,12 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/m3rashid/exam-portal/models"
 	"github.com/m3rashid/exam-portal/params"
-	"github.com/m3rashid/exam-portal/utils/config"
 	"github.com/m3rashid/exam-portal/utils/db"
 	"github.com/m3rashid/exam-portal/utils/helpers"
 	"github.com/m3rashid/exam-portal/utils/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func CurrentUser(c *gin.Context) *models.User {
+	sub, _ := c.Get("sub")
+	user, _ := models.FindUserByColum("id", sub)
+	return user
+}
 
 func Login(c *gin.Context) {
 	var reqBody params.LogIn
@@ -34,11 +39,15 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	payload := jwt.GenPayload(user.Role, user.ID.String())
+	jwt.RevokeLastJwt(payload)
+
+	token := jwt.Encoder(payload)
+
 	c.JSON(http.StatusOK, gin.H{
 		"status": "Logged in Successfully",
-		// TODO: fix this
-		"token": jwt.Encoder(jwt.GenPayload("", "", user.ID.String())),
-		"user":  user,
+		"token":  token,
+		"user":   user,
 	})
 }
 
@@ -57,9 +66,9 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(reqBody.Password), bcrypt.DefaultCost)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	hash, er := bcrypt.GenerateFromPassword([]byte(reqBody.Password), bcrypt.DefaultCost)
+	if er != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": er.Error()})
 		return
 	}
 
@@ -71,18 +80,40 @@ func Register(c *gin.Context) {
 		Role:     reqBody.Role,
 		Avatar:   reqBody.Avatar,
 		Active:   true,
-		Password: hash,
+		Password: string(hash),
+	})
+
+	payload := jwt.GenPayload(user.Role, user.ID.String())
+	jwt.RevokeLastJwt(payload)
+
+	token := jwt.Encoder(payload)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "User created successfully",
+		"token":  token,
+		"user":   user,
 	})
 }
 
-func CurrentUser(c *gin.Context) *models.User {
-	sub, _ := c.Get("sub")
-	user, _ := models.FindUserByColum("id", sub)
-	return user
+func Revalidate(c *gin.Context) {
+	user := CurrentUser(c)
+	payload := jwt.GenPayload(user.Role, user.ID.String())
+	jwt.RevokeLastJwt(payload)
+	token := jwt.Encoder(payload)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "Logged in Successfully",
+		"token":  token,
+		"user":   user,
+	})
 }
 
-func AuthPingHandler(c *gin.Context) {
-	c.String(http.StatusOK, "pong")
+func Logout(c *gin.Context) {
+	user := CurrentUser(c)
+	payload := jwt.GenPayload(user.Role, user.ID.String())
+	jwt.RevokeLastJwt(payload)
+
+	c.JSON(http.StatusOK, gin.H{"status": "Logged out successfully"})
 }
 
 func ChangePasswordInitHandler(c *gin.Context) {
@@ -109,7 +140,9 @@ func ChangePasswordInitHandler(c *gin.Context) {
 	// TODO: send otp to user email
 
 	// update the user with otp
-	db.DB.Model(&user).Updates(models.User{LastOtp: strconv.Itoa(otp)})
+	db.DB.Model(&user).Updates(models.User{
+		LastOtp: strconv.Itoa(otp),
+	})
 	c.JSON(http.StatusOK, gin.H{"status": "otp sent to email"})
 }
 
@@ -151,11 +184,9 @@ func ChangePasswordFinalHandler(c *gin.Context) {
 	encryptedPassword := string(hash)
 	var payload jwt.Payload
 	db.DB.Model(&user).Updates(models.User{Password: encryptedPassword})
-	payload = jwt.GenPayload("", "user", user.ID.String())
-	for _, device := range config.DEVICE_TYPES {
-		payload.Device = device
-		jwt.RevokeLastJwt(payload)
-	}
+
+	payload = jwt.GenPayload(user.Role, user.ID.String())
+	jwt.RevokeLastJwt(payload)
 
 	c.JSON(http.StatusOK, gin.H{"status": "update password success"})
 }
