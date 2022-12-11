@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 interface IProps extends PropsWithChildren {}
 
 const RootWrapper: FC<IProps> = ({ children }) => {
-  const { userType } = useRecoilValue(authState);
+  const { userType, isAuthenticated } = useRecoilValue(authState);
   const [ui, setUi] = useRecoilState(uiState);
   const navigate = useNavigate();
 
@@ -34,7 +34,12 @@ const RootWrapper: FC<IProps> = ({ children }) => {
   const {
     token: { colorBgContainer },
   } = antdTheme.useToken();
-  const sidebarItems = getItems(navigate, userType);
+  const loggedInUserBasedSidebarItems = getItems(navigate, userType);
+  const loggedInUserSidebarItems = openToAllItems(navigate);
+
+  const itemsToShow = isAuthenticated
+    ? loggedInUserSidebarItems
+    : [loggedInUserSidebarItems[loggedInUserSidebarItems.length - 1]];
 
   const greyBackgroundColor = "#f5f5f5";
 
@@ -63,9 +68,9 @@ const RootWrapper: FC<IProps> = ({ children }) => {
               marginBottom: 10,
               borderBottomRightRadius: 8,
             }}
-            onClick={() =>
-              setUi((prev) => ({ ...prev, sidebarOpen: !prev.sidebarOpen }))
-            }
+            onClick={() => {
+              setUi((prev) => ({ ...prev, sidebarOpen: !prev.sidebarOpen }));
+            }}
           >
             <MenuUnfoldOutlined style={{ fontSize: 24, margin: "auto" }} />
           </div>
@@ -84,7 +89,7 @@ const RootWrapper: FC<IProps> = ({ children }) => {
               theme="light"
               mode="inline"
               defaultSelectedKeys={["1"]}
-              items={sidebarItems}
+              items={loggedInUserBasedSidebarItems}
               style={{ border: 0, background: greyBackgroundColor }}
             />
 
@@ -92,7 +97,7 @@ const RootWrapper: FC<IProps> = ({ children }) => {
               theme="light"
               mode="inline"
               defaultSelectedKeys={["1"]}
-              items={openToAllItems(navigate)}
+              items={itemsToShow}
               style={{ border: 0, background: greyBackgroundColor }}
             />
           </div>

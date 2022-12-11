@@ -7,7 +7,7 @@ import {
   traineeRoutes,
   trainerRoutes,
 } from "./routeConstants";
-import { AuthState, UserType } from "../atoms/auth";
+import { AuthState, roles, UserType } from "../atoms/auth";
 import AllPastTests from "../pages/trainee/allPastTests";
 import SinglePastTestDetails from "../pages/trainee/singlePastTestDetails";
 import TakeTest from "../pages/trainee/takeTest";
@@ -45,79 +45,79 @@ export const routes: Route[] = [
   {
     path: generalAuthenticatedRoutes.profile,
     component: Profile,
-    role: ["TRAINEE", "TRAINER", "ADMIN", "SUPER_ADMIN"],
+    role: Object.values(roles),
   },
   {
     path: generalAuthenticatedRoutes.settings,
     component: Settings,
-    role: ["TRAINEE", "TRAINER", "ADMIN", "SUPER_ADMIN"],
+    role: Object.values(roles),
   },
   {
     path: generalAuthenticatedRoutes.logout,
     component: Logout,
-    role: ["TRAINEE", "TRAINER", "ADMIN", "SUPER_ADMIN"],
+    role: Object.values(roles),
   },
 
   // Trainee Routes
   {
     path: traineeRoutes.allPastTests,
     component: AllPastTests,
-    role: ["TRAINEE"],
+    role: [roles.trainee],
   },
   {
     path: traineeRoutes.singlePastTestDetails,
     component: SinglePastTestDetails,
-    role: ["TRAINEE"],
+    role: [roles.trainee],
   },
   {
     path: traineeRoutes.takeTest,
     component: TakeTest,
-    role: ["TRAINEE"],
+    role: [roles.trainee],
   },
   {
     path: traineeRoutes.registerForTest,
     component: RegisterForTest,
-    role: ["TRAINEE"],
+    role: [roles.trainee],
   },
 
   // Trainer Routes
   {
     path: trainerRoutes.allQuestions,
     component: AllQuestions,
-    role: ["TRAINER"],
+    role: [roles.trainer],
   },
   {
     path: trainerRoutes.allTests,
     component: AllTests,
-    role: ["TRAINER"],
+    role: [roles.trainer],
   },
   {
     path: trainerRoutes.newTest,
     component: NewTest,
-    role: ["TRAINER"],
+    role: [roles.trainer],
   },
   {
     path: trainerRoutes.conductTest,
     component: ConductTest,
-    role: ["TRAINER"],
+    role: [roles.trainer],
   },
 
   // Admin Routes
   {
     path: adminRoutes.allTrainers,
     component: AllTrainers,
-    role: ["ADMIN", "SUPER_ADMIN"],
+    role: [roles.admin, roles.superAdmin],
   },
   {
     path: adminRoutes.allCourses,
     component: AllCourses,
-    role: ["ADMIN", "SUPER_ADMIN"],
+    role: [roles.admin, roles.superAdmin],
   },
 
   // Super Admin Routes
   {
     path: superAdminRoutes.allOrganizations,
     component: AllOrganizations,
-    role: ["SUPER_ADMIN"],
+    role: [roles.superAdmin],
   },
 ];

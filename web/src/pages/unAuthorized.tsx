@@ -17,7 +17,7 @@ const UnAuthorized: React.FC<IProps> = () => {
         justifyContent: "center",
       }}
     >
-      <Typography.Title level={4}>
+      <Typography.Title level={4} style={{ textAlign: "center" }}>
         You are not authorized to view this page
       </Typography.Title>
       <Button onClick={() => navigate("/")}>Back to Home</Button>

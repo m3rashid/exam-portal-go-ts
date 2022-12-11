@@ -30,7 +30,7 @@ const Logout: React.FC<IProps> = () => {
         justifyContent: "center",
       }}
     >
-      <Typography.Title level={3}>
+      <Typography.Title level={3} style={{ textAlign: "center" }}>
         Are you sure you want to logout ?
       </Typography.Title>
       <Button onClick={handleLogout} loading={auth.loading}>

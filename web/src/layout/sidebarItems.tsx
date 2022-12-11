@@ -53,16 +53,16 @@ export const openToAllItems: (navigate: NavigateFunction) => ItemType[] = (
     onClick: () => navigate(generalAuthenticatedRoutes.settings),
   },
   {
-    key: "8",
-    icon: <InfoCircleOutlined />,
-    label: "About",
-    onClick: () => navigate(generalRoutes.about),
-  },
-  {
     key: "9",
     icon: <LogoutOutlined />,
     label: "Logout",
     onClick: () => navigate(generalAuthenticatedRoutes.logout),
+  },
+  {
+    key: "8",
+    icon: <InfoCircleOutlined />,
+    label: "About",
+    onClick: () => navigate(generalRoutes.about),
   },
 ];
 
