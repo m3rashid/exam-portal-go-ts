@@ -12,8 +12,8 @@ export const generalAuthenticatedRoutes = {
 export const traineeRoutes = {
   allPastTests: "/trainee/tests/past",
   singlePastTestDetails: "/trainee/tests/past/details",
-  takeTest: "/trainee/tests/:testId",
-  registerForTest: "/trainee/tests/:testId/register",
+  takeTest: "/trainee/tests?testId=",
+  registerForTest: "/trainee/tests/register?testId=",
 };
 
 export const trainerRoutes = {
