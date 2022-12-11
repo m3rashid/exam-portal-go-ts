@@ -1,9 +1,10 @@
-import { FC } from "react";
+import { FC, lazy } from "react";
 import { AuthState, UserType } from "../atoms/auth";
-import Logout from "../pages/logout";
-import Profile from "../pages/profile";
-import Settings from "../pages/settings";
 import { generalAuthenticatedRoutes } from "./routeConstants";
+
+const Logout = lazy(() => import("../pages/logout"));
+const Profile = lazy(() => import("../pages/profile"));
+const Settings = lazy(() => import("../pages/settings"));
 
 interface Route {
   path: string;

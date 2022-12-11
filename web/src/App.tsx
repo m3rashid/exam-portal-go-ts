@@ -1,6 +1,6 @@
 import "antd/dist/reset.css";
 import { useRecoilState } from "recoil";
-import { useCallback, useEffect } from "react";
+import { Suspense, useCallback, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import Home from "./pages/home";
@@ -53,29 +53,31 @@ const App = () => {
 
   return (
     <RootWrapper>
-      <Routes>
-        {routes.map((route, index) => {
-          const allowed = checkAccess(auth, route);
-          if (!allowed) {
+      <Suspense fallback={<FullPageLoading />}>
+        <Routes>
+          {routes.map((route, index) => {
+            const allowed = checkAccess(auth, route);
+            if (!allowed) {
+              return (
+                <Route
+                  path="*"
+                  element={<UnAuthorized />}
+                  key={`route ${index} ${route.path}`}
+                />
+              );
+            }
             return (
               <Route
+                path={route.path}
+                element={<route.component />}
                 key={`route ${index} ${route.path}`}
-                element={<UnAuthorized />}
               />
             );
-          }
-
-          return (
-            <Route
-              key={`route ${index} ${route.path}`}
-              path={route.path}
-              element={<route.component />}
-            />
-          );
-        })}
-        <Route path={generalRoutes.home} element={<Home />} />
-        <Route path={generalRoutes.about} element={<About />} />
-      </Routes>
+          })}
+          <Route path={generalRoutes.home} element={<Home />} />
+          <Route path={generalRoutes.about} element={<About />} />
+        </Routes>
+      </Suspense>
     </RootWrapper>
   );
 };

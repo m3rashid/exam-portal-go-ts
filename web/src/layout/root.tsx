@@ -135,6 +135,7 @@ const RootWrapper: FC<IProps> = ({ children }) => {
                 borderRadius: 8,
                 background: colorBgContainer,
                 overflowY: "auto",
+                minHeight: "calc(100vh - 124px)",
               }}
             >
               {children}
