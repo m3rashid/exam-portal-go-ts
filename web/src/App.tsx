@@ -11,6 +11,7 @@ import { authState } from "./atoms/auth";
 import { checkAccess, routes } from "./layout/routes";
 import FullPageLoading from "./layout/fullPageLoading";
 import UnAuthorized from "./pages/unAuthorized";
+import { generalRoutes } from "./layout/routeConstants";
 
 const App = () => {
   const [auth, setAuth] = useRecoilState(authState);
@@ -40,7 +41,6 @@ const App = () => {
 
   useEffect(() => {
     if (auth.isAuthenticated) {
-      console.log("User is authenticated");
       instance.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${auth.token}`;
@@ -57,7 +57,12 @@ const App = () => {
         {routes.map((route, index) => {
           const allowed = checkAccess(auth, route);
           if (!allowed) {
-            return <UnAuthorized />;
+            return (
+              <Route
+                key={`route ${index} ${route.path}`}
+                element={<UnAuthorized />}
+              />
+            );
           }
 
           return (
@@ -68,8 +73,8 @@ const App = () => {
             />
           );
         })}
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
+        <Route path={generalRoutes.home} element={<Home />} />
+        <Route path={generalRoutes.about} element={<About />} />
       </Routes>
     </RootWrapper>
   );

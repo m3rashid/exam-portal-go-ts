@@ -12,14 +12,16 @@ import { FC, PropsWithChildren, useEffect } from "react";
 import theme from "./theme";
 import { uiState } from "../atoms/ui";
 import { authState } from "../atoms/auth";
-import { getItems } from "./sidebarItems";
+import { getItems, openToAllItems } from "./sidebarItems";
 import { localStorageKeys } from "./localStorage";
+import { useNavigate } from "react-router-dom";
 
 interface IProps extends PropsWithChildren {}
 
 const RootWrapper: FC<IProps> = ({ children }) => {
   const { userType } = useRecoilValue(authState);
   const [ui, setUi] = useRecoilState(uiState);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -32,7 +34,9 @@ const RootWrapper: FC<IProps> = ({ children }) => {
   const {
     token: { colorBgContainer },
   } = antdTheme.useToken();
-  const sidebarItems = getItems(userType);
+  const sidebarItems = getItems(navigate, userType);
+
+  const greyBackgroundColor = "#f5f5f5";
 
   return (
     <ConfigProvider theme={theme}>
@@ -55,7 +59,7 @@ const RootWrapper: FC<IProps> = ({ children }) => {
               display: "flex",
               width: "100%",
               cursor: "pointer",
-              background: "#f5f5f5",
+              background: greyBackgroundColor,
               marginBottom: 10,
               borderBottomRightRadius: 8,
             }}
@@ -65,24 +69,42 @@ const RootWrapper: FC<IProps> = ({ children }) => {
           >
             <MenuUnfoldOutlined style={{ fontSize: 24, margin: "auto" }} />
           </div>
-
-          <Menu
-            theme="light"
-            mode="inline"
-            defaultSelectedKeys={["1"]}
-            items={sidebarItems}
+          <div
             style={{
-              background: "#f5f5f5",
-              height: "calc(100% - 74px)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              background: greyBackgroundColor,
+              height: "calc(100% - 75px)",
               width: ui.sidebarOpen ? 190 : 70,
               borderTopRightRadius: 8,
-              border: 0,
-              flex: 1,
             }}
-          />
+          >
+            <Menu
+              theme="light"
+              mode="inline"
+              defaultSelectedKeys={["1"]}
+              items={sidebarItems}
+              style={{ border: 0, background: greyBackgroundColor }}
+            />
+
+            <Menu
+              theme="light"
+              mode="inline"
+              defaultSelectedKeys={["1"]}
+              items={openToAllItems(navigate)}
+              style={{ border: 0, background: greyBackgroundColor }}
+            />
+          </div>
         </Layout.Sider>
         <Layout style={{ background: colorBgContainer }}>
-          <Layout.Header style={{ padding: 0, background: colorBgContainer }}>
+          <Layout.Header
+            style={{
+              padding: 0,
+              background: greyBackgroundColor,
+              borderBottomLeftRadius: 8,
+            }}
+          >
             <Typography.Title
               level={3}
               style={{
@@ -98,7 +120,7 @@ const RootWrapper: FC<IProps> = ({ children }) => {
           <div
             style={{
               margin: 1,
-              background: "#f5f5f5",
+              background: greyBackgroundColor,
               height: "100%",
               borderTopLeftRadius: 8,
               borderTopRightRadius: 8,
