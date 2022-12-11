@@ -28,7 +28,7 @@ export interface AuthState {
 export const defaultAuthState: AuthState = {
   isAuthenticated: false,
   user: null,
-  userType: "TRAINEE",
+  userType: null,
   loading: true,
   error: null,
   token: null,

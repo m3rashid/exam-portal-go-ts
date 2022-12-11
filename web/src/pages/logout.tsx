@@ -21,7 +21,15 @@ const Logout: React.FC<IProps> = () => {
   };
 
   return (
-    <div>
+    <div
+      style={{
+        height: "calc(100vh - 150px)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <Typography.Title level={3}>
         Are you sure you want to logout ?
       </Typography.Title>
