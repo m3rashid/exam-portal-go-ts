@@ -14,12 +14,13 @@ import {
 import { NavigateFunction } from "react-router-dom";
 import type { ItemType } from "antd/es/menu/hooks/useItems";
 
-import type { UserType } from "../atoms/auth";
+import { roles, UserType } from "../atoms/auth";
 import {
   adminRoutes,
   generalAuthenticatedRoutes,
   generalRoutes,
   superAdminRoutes,
+  traineeRoutes,
   trainerRoutes,
 } from "./routeConstants";
 
@@ -97,7 +98,27 @@ export const trainerItems: (navigate: NavigateFunction) => SidebarItems = (
 
 export const traineeItems: (navigate: NavigateFunction) => SidebarItems = (
   navigate
-) => [];
+) => [
+  defaultItems(navigate).home,
+  {
+    key: "2",
+    icon: <UserOutlined />,
+    label: "Al Past Tests",
+    onClick: () => navigate(traineeRoutes.allPastTests),
+  },
+  {
+    key: "3",
+    icon: <UserOutlined />,
+    label: "Take Test",
+    onClick: () => navigate(traineeRoutes.takeTest),
+  },
+  {
+    key: "4",
+    icon: <UserOutlined />,
+    label: "Register For Test",
+    onClick: () => navigate(traineeRoutes.registerForTest),
+  },
+];
 
 export const adminItems: (navigate: NavigateFunction) => SidebarItems = (
   navigate
@@ -169,13 +190,13 @@ export const getItems = (
   userType: UserType | null
 ): SidebarItems => {
   switch (userType) {
-    case "TRAINER":
-      return trainerItems(navigate);
-    case "TRAINEE":
+    case roles.trainee:
       return traineeItems(navigate);
-    case "ADMIN":
+    case roles.trainer:
+      return trainerItems(navigate);
+    case roles.admin:
       return adminItems(navigate);
-    case "SUPER_ADMIN":
+    case roles.superAdmin:
       return superAdminItems(navigate);
     default:
       return process.env.NODE_ENV === "development"

@@ -7,6 +7,13 @@ export const UserRoles = [
   "SUPER_ADMIN",
 ] as const;
 
+export const roles = {
+  trainee: UserRoles[0],
+  trainer: UserRoles[1],
+  admin: UserRoles[2],
+  superAdmin: UserRoles[3],
+};
+
 export type UserType = typeof UserRoles[number];
 
 export interface AuthState {
@@ -21,7 +28,7 @@ export interface AuthState {
 export const defaultAuthState: AuthState = {
   isAuthenticated: false,
   user: null,
-  userType: null,
+  userType: "TRAINEE",
   loading: true,
   error: null,
   token: null,
