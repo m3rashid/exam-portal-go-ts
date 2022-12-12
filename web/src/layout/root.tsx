@@ -5,16 +5,20 @@ import {
   theme as antdTheme,
   Typography,
 } from "antd";
+import { useNavigate } from "react-router-dom";
 import { MenuUnfoldOutlined } from "@ant-design/icons";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { FC, PropsWithChildren, useEffect } from "react";
 
+import {
+  getItems,
+  unAuthenticatedUserItems,
+  openToAllAuthenticatedUsersItems,
+} from "./sidebarItems";
 import theme from "./theme";
 import { uiState } from "../atoms/ui";
 import { authState } from "../atoms/auth";
-import { getItems, openToAllItems } from "./sidebarItems";
 import { localStorageKeys } from "./localStorage";
-import { useNavigate } from "react-router-dom";
 
 interface IProps extends PropsWithChildren {}
 
@@ -35,11 +39,10 @@ const RootWrapper: FC<IProps> = ({ children }) => {
     token: { colorBgContainer },
   } = antdTheme.useToken();
   const loggedInUserBasedSidebarItems = getItems(navigate, userType);
-  const loggedInUserSidebarItems = openToAllItems(navigate);
 
   const itemsToShow = isAuthenticated
-    ? loggedInUserSidebarItems
-    : [loggedInUserSidebarItems[loggedInUserSidebarItems.length - 1]];
+    ? openToAllAuthenticatedUsersItems(navigate)
+    : unAuthenticatedUserItems(navigate);
 
   const greyBackgroundColor = "#f5f5f5";
 

@@ -36,7 +36,7 @@ const RegisterForTest = lazy(() => import("../pages/trainee/registerForTest"));
 interface Route {
   path: string;
   component: FC;
-  role: UserType[];
+  role: UserType[] | "*";
 }
 
 export const checkAccess = (
@@ -44,9 +44,9 @@ export const checkAccess = (
   route: Route,
   authRequired: boolean
 ) => {
-  if (!authRequired && !Auth.isAuthenticated) return true;
+  if (!authRequired) return !Auth.isAuthenticated;
   if (!Auth.isAuthenticated) return false;
-
+  if (route.role === "*") return true;
   const userType = Auth.userType;
   if (!userType) return false;
   return route.role.some((role) => userType.includes(role));
@@ -79,17 +79,17 @@ export const routes: Route[] = [
   {
     path: generalAuthenticatedRoutes.profile,
     component: Profile,
-    role: Object.values(roles),
+    role: "*",
   },
   {
     path: generalAuthenticatedRoutes.settings,
     component: Settings,
-    role: Object.values(roles),
+    role: "*",
   },
   {
     path: generalAuthenticatedRoutes.logout,
     component: Logout,
-    role: Object.values(roles),
+    role: "*",
   },
 
   // Trainee Routes

@@ -1,15 +1,15 @@
 import {
   CopyOutlined,
   HomeOutlined,
-  UploadOutlined,
   UserOutlined,
-  VideoCameraOutlined,
-  QuestionCircleOutlined,
   BookOutlined,
   GroupOutlined,
-  SettingOutlined,
   LogoutOutlined,
+  SettingOutlined,
   InfoCircleOutlined,
+  QuestionCircleOutlined,
+  LoginOutlined,
+  KeyOutlined,
 } from "@ant-design/icons";
 import { NavigateFunction } from "react-router-dom";
 import type { ItemType } from "antd/es/menu/hooks/useItems";
@@ -17,11 +17,12 @@ import type { ItemType } from "antd/es/menu/hooks/useItems";
 import { roles, UserType } from "../atoms/auth";
 import {
   adminRoutes,
-  generalAuthenticatedRoutes,
-  generalRoutes,
-  superAdminRoutes,
   traineeRoutes,
   trainerRoutes,
+  generalRoutes,
+  superAdminRoutes,
+  generalAuthenticatedRoutes,
+  generalUnauthenticatedRoutes,
 } from "./routeConstants";
 
 type SidebarItems = ItemType[];
@@ -35,11 +36,47 @@ export const defaultItems: (navigate: NavigateFunction) => {
     label: "Home",
     onClick: () => navigate(generalRoutes.home),
   },
+  about: {
+    key: "12",
+    icon: <InfoCircleOutlined />,
+    label: "About",
+    onClick: () => navigate(generalRoutes.about),
+  },
 });
 
-export const openToAllItems: (navigate: NavigateFunction) => ItemType[] = (
-  navigate
-) => [
+export const unAuthenticatedUserItems: (
+  navigate: NavigateFunction
+) => ItemType[] = (navigate) => [
+  {
+    key: "8",
+    icon: <LoginOutlined />,
+    label: "Login",
+    onClick: () => navigate(generalUnauthenticatedRoutes.login),
+  },
+  {
+    key: "9",
+    icon: <LoginOutlined />,
+    label: "Register",
+    onClick: () => navigate(generalUnauthenticatedRoutes.register),
+  },
+  {
+    key: "10",
+    icon: <KeyOutlined />,
+    label: "Forgot Password",
+    onClick: () => navigate(generalUnauthenticatedRoutes.forgotPassword),
+  },
+  {
+    key: "11",
+    icon: <KeyOutlined />,
+    label: "Reset Password",
+    onClick: () => navigate(generalUnauthenticatedRoutes.resetPassword),
+  },
+  defaultItems(navigate).about,
+];
+
+export const openToAllAuthenticatedUsersItems: (
+  navigate: NavigateFunction
+) => ItemType[] = (navigate) => [
   {
     key: "6",
     icon: <UserOutlined />,
@@ -57,12 +94,6 @@ export const openToAllItems: (navigate: NavigateFunction) => ItemType[] = (
     icon: <LogoutOutlined />,
     label: "Logout",
     onClick: () => navigate(generalAuthenticatedRoutes.logout),
-  },
-  {
-    key: "8",
-    icon: <InfoCircleOutlined />,
-    label: "About",
-    onClick: () => navigate(generalRoutes.about),
   },
 ];
 
@@ -162,29 +193,6 @@ export const superAdminItems: (navigate: NavigateFunction) => SidebarItems = (
   },
 ];
 
-const testSidebaritems: (navigate: NavigateFunction) => SidebarItems = (
-  navigate
-) => [
-  {
-    key: "1",
-    icon: <UserOutlined />,
-    label: "nav 1",
-    onClick: () => navigate(generalRoutes.home),
-  },
-  {
-    key: "2",
-    icon: <VideoCameraOutlined />,
-    label: "nav 2",
-    onClick: () => navigate(generalRoutes.home),
-  },
-  {
-    key: "3",
-    icon: <UploadOutlined />,
-    label: "nav 3",
-    onClick: () => navigate(generalRoutes.home),
-  },
-];
-
 export const getItems = (
   navigate: NavigateFunction,
   userType: UserType | null
@@ -199,8 +207,6 @@ export const getItems = (
     case roles.superAdmin:
       return superAdminItems(navigate);
     default:
-      return process.env.NODE_ENV === "development"
-        ? testSidebaritems(navigate)
-        : [];
+      return [defaultItems(navigate).home];
   }
 };

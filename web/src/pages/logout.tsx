@@ -1,16 +1,17 @@
 import React from "react";
-import { Button, Typography } from "antd";
 import { useRecoilState } from "recoil";
+import { Button, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 
-import { authState, defaultAuthState } from "../atoms/auth";
 import { generalRoutes } from "../layout/routeConstants";
+import { authState, defaultAuthState } from "../atoms/auth";
+import { parentDivStyle } from "../utils/centerEverythinginPage";
 
 interface IProps {}
 
 const Logout: React.FC<IProps> = () => {
-  const [auth, setAuth] = useRecoilState(authState);
   const navigate = useNavigate();
+  const [auth, setAuth] = useRecoilState(authState);
 
   const handleLogout = () => {
     setAuth((prev) => ({ ...prev, loading: true }));
@@ -21,15 +22,7 @@ const Logout: React.FC<IProps> = () => {
   };
 
   return (
-    <div
-      style={{
-        height: "calc(100vh - 150px)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <div style={parentDivStyle}>
       <Typography.Title level={3} style={{ textAlign: "center" }}>
         Are you sure you want to logout ?
       </Typography.Title>

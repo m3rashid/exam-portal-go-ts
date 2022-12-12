@@ -1,17 +1,19 @@
 import "antd/dist/reset.css";
 import { useRecoilState } from "recoil";
-import { Suspense, useCallback, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
+import { lazy, Suspense, useCallback, useEffect } from "react";
 
-import Home from "./pages/home";
-import About from "./pages/about";
 import instance from "./api/instance";
 import RootWrapper from "./layout/root";
 import { authState } from "./atoms/auth";
 import { checkAccess, routes } from "./layout/routes";
 import FullPageLoading from "./layout/fullPageLoading";
-import UnAuthorized from "./pages/unAuthorized";
 import { generalRoutes } from "./layout/routeConstants";
+import NotFound from "./pages/notFound";
+
+const Home = lazy(() => import("./pages/home"));
+const About = lazy(() => import("./pages/about"));
+const UnAuthorized = lazy(() => import("./pages/unAuthorized"));
 
 const App = () => {
   const [auth, setAuth] = useRecoilState(authState);
@@ -47,17 +49,16 @@ const App = () => {
     }
   }, [auth]);
 
-  if (auth.loading) {
-    return <FullPageLoading />;
-  }
+  if (auth.loading) return <FullPageLoading />;
 
   return (
     <RootWrapper>
       <Suspense fallback={<FullPageLoading />}>
         <Routes>
           {routes.map((route, index) => {
-            const unAuthRequiredRoute = checkAccess(auth, route, false);
-            if (unAuthRequiredRoute) {
+            const isNoAuthRequiredRoute = checkAccess(auth, route, false);
+            const isAuthRequiredRoute = checkAccess(auth, route, true);
+            if (!isNoAuthRequiredRoute) {
               return (
                 <Route
                   path={route.path}
@@ -67,8 +68,7 @@ const App = () => {
               );
             }
 
-            const authRequiredRoute = checkAccess(auth, route, true);
-            if (!authRequiredRoute) {
+            if (!isAuthRequiredRoute) {
               return (
                 <Route
                   path="*"
@@ -88,6 +88,7 @@ const App = () => {
           })}
           <Route path={generalRoutes.home} element={<Home />} />
           <Route path={generalRoutes.about} element={<About />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </RootWrapper>
