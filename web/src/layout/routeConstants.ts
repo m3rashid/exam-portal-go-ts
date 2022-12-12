@@ -3,6 +3,13 @@ export const generalRoutes = {
   about: "/about",
 };
 
+export const generalUnauthenticatedRoutes = {
+  login: "/login",
+  register: "/register",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
+};
+
 export const generalAuthenticatedRoutes = {
   profile: "/profile",
   settings: "/settings",

@@ -29,7 +29,7 @@ const App = () => {
     await waitForSeconds(2);
     setAuth({
       ...auth,
-      isAuthenticated: true,
+      // isAuthenticated: true,
       loading: false,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,8 +56,19 @@ const App = () => {
       <Suspense fallback={<FullPageLoading />}>
         <Routes>
           {routes.map((route, index) => {
-            const allowed = checkAccess(auth, route);
-            if (!allowed) {
+            const unAuthRequiredRoute = checkAccess(auth, route, false);
+            if (unAuthRequiredRoute) {
+              return (
+                <Route
+                  path={route.path}
+                  element={<route.component />}
+                  key={`route ${index} ${route.path}`}
+                />
+              );
+            }
+
+            const authRequiredRoute = checkAccess(auth, route, true);
+            if (!authRequiredRoute) {
               return (
                 <Route
                   path="*"
@@ -66,6 +77,7 @@ const App = () => {
                 />
               );
             }
+
             return (
               <Route
                 path={route.path}

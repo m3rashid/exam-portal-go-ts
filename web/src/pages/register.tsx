@@ -1,12 +1,18 @@
+import { Form } from "antd";
 import React from "react";
+
+import FormBuilder from "../components/formBuilder";
+import { registerForm } from "../components/forms/register";
 
 interface IProps {}
 
 const Register: React.FC<IProps> = () => {
   return (
-    <>
-      <div>Register</div>
-    </>
+    <div>
+      <Form>
+        <FormBuilder formItems={registerForm} />
+      </Form>
+    </div>
   );
 };
 

@@ -3,28 +3,35 @@ import { FC, lazy } from "react";
 import {
   adminRoutes,
   generalAuthenticatedRoutes,
+  generalUnauthenticatedRoutes,
   superAdminRoutes,
   traineeRoutes,
   trainerRoutes,
 } from "./routeConstants";
 import { AuthState, roles, UserType } from "../atoms/auth";
-import AllPastTests from "../pages/trainee/allPastTests";
-import SinglePastTestDetails from "../pages/trainee/singlePastTestDetails";
-import TakeTest from "../pages/trainee/takeTest";
-import RegisterForTest from "../pages/trainee/registerForTest";
 
+const Login = lazy(() => import("../pages/login"));
 const Logout = lazy(() => import("../pages/logout"));
 const AllOrganizations = lazy(
   () => import("../pages/superAdmin/allOrganizations")
 );
 const Profile = lazy(() => import("../pages/profile"));
+const SinglePastTestDetails = lazy(
+  () => import("../pages/trainee/singlePastTestDetails")
+);
+const Register = lazy(() => import("../pages/register"));
 const Settings = lazy(() => import("../pages/settings"));
 const NewTest = lazy(() => import("../pages/trainer/newTest"));
+const TakeTest = lazy(() => import("../pages/trainee/takeTest"));
 const AllTests = lazy(() => import("../pages/trainer/allTests"));
 const AllCourses = lazy(() => import("../pages/admin/allCourses"));
+const ResetPassword = lazy(() => import("../pages/resetPassword"));
 const AllTrainers = lazy(() => import("../pages/admin/allTrainers"));
+const ForgotPassword = lazy(() => import("../pages/forgotPassword"));
 const ConductTest = lazy(() => import("../pages/trainer/conductTest"));
+const AllPastTests = lazy(() => import("../pages/trainee/allPastTests"));
 const AllQuestions = lazy(() => import("../pages/trainer/allQuestions"));
+const RegisterForTest = lazy(() => import("../pages/trainee/registerForTest"));
 
 interface Route {
   path: string;
@@ -32,7 +39,12 @@ interface Route {
   role: UserType[];
 }
 
-export const checkAccess = (Auth: AuthState, route: Route) => {
+export const checkAccess = (
+  Auth: AuthState,
+  route: Route,
+  authRequired: boolean
+) => {
+  if (!authRequired && !Auth.isAuthenticated) return true;
   if (!Auth.isAuthenticated) return false;
 
   const userType = Auth.userType;
@@ -41,6 +53,28 @@ export const checkAccess = (Auth: AuthState, route: Route) => {
 };
 
 export const routes: Route[] = [
+  // all Unauthenticated Routes
+  {
+    path: generalUnauthenticatedRoutes.login,
+    component: Login,
+    role: [],
+  },
+  {
+    path: generalUnauthenticatedRoutes.register,
+    component: Register,
+    role: [],
+  },
+  {
+    path: generalUnauthenticatedRoutes.forgotPassword,
+    component: ForgotPassword,
+    role: [],
+  },
+  {
+    path: generalUnauthenticatedRoutes.resetPassword,
+    component: ResetPassword,
+    role: [],
+  },
+
   // All Authenticated Routes
   {
     path: generalAuthenticatedRoutes.profile,
