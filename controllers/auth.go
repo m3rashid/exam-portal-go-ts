@@ -8,6 +8,7 @@ import (
 	"github.com/m3rashid/exam-portal/models"
 	"github.com/m3rashid/exam-portal/params"
 	"github.com/m3rashid/exam-portal/utils/db"
+	"github.com/m3rashid/exam-portal/utils/email"
 	"github.com/m3rashid/exam-portal/utils/helpers"
 	"github.com/m3rashid/exam-portal/utils/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -24,18 +25,18 @@ func Login(c *gin.Context) {
 	var user *models.User
 
 	if err := c.ShouldBind(&reqBody); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		StatusError(c, http.StatusBadRequest, "fail", err.Error())
 		return
 	}
 
 	user, err := models.FindUserByEmail(reqBody.Email)
 	if err {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "User does not exists"})
+		StatusError(c, http.StatusBadRequest, "fail", "User does not exists")
 		return
 	}
 
 	if !user.Active {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "User does not exists"}) // deleted user
+		StatusError(c, http.StatusBadRequest, "fail", "User is not active")
 		return
 	}
 
@@ -56,29 +57,35 @@ func Register(c *gin.Context) {
 	var user *models.User
 
 	if err := c.ShouldBind(&reqBody); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		StatusError(c, http.StatusBadRequest, "fail", err.Error())
 		return
 	}
 
 	if reqBody.Password != reqBody.ConfirmPassword {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "password and password confirmation does not match"})
+		StatusError(c, http.StatusBadRequest, "fail", "password and password confirmation does not match")
 		return
 	}
 
 	if !helpers.Contains(models.UserRoleTypeValues, reqBody.Role) {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "Invalid role"})
+		StatusError(c, http.StatusBadRequest, "fail", "Invalid role")
+		return
+	}
+
+	_, isValid, _ := email.CheckEmailDomain(reqBody.Email)
+	if !isValid {
+		StatusError(c, http.StatusBadRequest, "fail", "Invalid email")
 		return
 	}
 
 	user, err := models.FindUserByEmail(reqBody.Email)
 	if !err {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "A user already exists with same credentials"})
+		StatusError(c, http.StatusBadRequest, "fail", "A user already exists with same credentials")
 		return
 	}
 
 	hash, er := bcrypt.GenerateFromPassword([]byte(reqBody.Password), bcrypt.DefaultCost)
 	if er != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": er.Error()})
+		StatusError(c, http.StatusBadRequest, "fail", er.Error())
 		return
 	}
 
@@ -131,18 +138,18 @@ func ChangePasswordInitHandler(c *gin.Context) {
 	var user *models.User
 
 	if err := c.ShouldBind(&change); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		StatusError(c, http.StatusBadRequest, "fail", err.Error())
 		return
 	}
 
 	user, err := models.FindUserByEmail(change.Email)
 	if err {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "User not found"})
+		StatusError(c, http.StatusBadRequest, "fail", "User does not exists")
 		return
 	}
 
 	if !user.Active {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "User does not exists"}) // deleted user
+		StatusError(c, http.StatusBadRequest, "fail", "User is not active")
 		return
 	}
 
@@ -162,12 +169,12 @@ func ChangePasswordFinalHandler(c *gin.Context) {
 	var user *models.User
 
 	if err := c.ShouldBind(&change); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		StatusError(c, http.StatusBadRequest, "fail", err.Error())
 		return
 	}
 
 	if change.Password != change.ConfirmPassword {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "password and password confirm not match"})
+		StatusError(c, http.StatusBadRequest, "fail", "passwords do not match")
 		return
 	}
 
@@ -175,19 +182,19 @@ func ChangePasswordFinalHandler(c *gin.Context) {
 	oldEncryptedPassword = user.Password
 
 	if user.LastOtp != change.Otp {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "Otp did not match, try again after some time"})
+		StatusError(c, http.StatusBadRequest, "fail", "Otp did not match, try again after some time")
 		return
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(oldEncryptedPassword), []byte(change.OriginalPassword))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "origin password error"})
+		StatusError(c, http.StatusBadRequest, "fail", "origin password error")
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(change.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		StatusError(c, http.StatusBadRequest, "error", err.Error())
 		return
 	}
 

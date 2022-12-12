@@ -14,7 +14,7 @@ type CheckDomainResult struct {
 	dmarcRecord string
 }
 
-func CheckDomain(domain string) (CheckDomainResult, bool, error) {
+func CheckEmailDomain(domain string) (CheckDomainResult, bool, error) {
 	var result CheckDomainResult
 
 	mxRecords, err := net.LookupMX(domain)
