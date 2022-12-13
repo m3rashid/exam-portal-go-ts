@@ -23,7 +23,7 @@ import {
   superAdminRoutes,
   generalAuthenticatedRoutes,
   generalUnauthenticatedRoutes,
-} from "./routeConstants";
+} from "../api/frontendRouteConstants";
 
 type SidebarItems = ItemType[];
 

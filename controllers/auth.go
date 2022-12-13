@@ -40,6 +40,13 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	// compare password
+	er := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(reqBody.Password))
+	if er != nil {
+		StatusError(c, http.StatusBadRequest, "fail", "Invalid credentials")
+		return
+	}
+
 	payload := jwt.GenPayload(user.Role, user.ID.String())
 	jwt.RevokeLastJwt(payload)
 

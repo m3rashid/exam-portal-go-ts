@@ -134,6 +134,9 @@ const RootWrapper: FC<IProps> = ({ children }) => {
               borderTopRightRadius: 8,
               marginRight: 12,
               marginTop: 10,
+              // minHeight: "calc(100vh - 124px)",
+              overflowY: "auto",
+              contain: "none",
             }}
           >
             <Layout.Content
@@ -142,8 +145,6 @@ const RootWrapper: FC<IProps> = ({ children }) => {
                 padding: 12,
                 borderRadius: 8,
                 background: colorBgContainer,
-                overflowY: "auto",
-                minHeight: "calc(100vh - 124px)",
               }}
             >
               {children}

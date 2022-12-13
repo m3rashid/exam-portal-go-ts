@@ -7,7 +7,7 @@ import {
   superAdminRoutes,
   traineeRoutes,
   trainerRoutes,
-} from "./routeConstants";
+} from "../api/frontendRouteConstants";
 import { AuthState, roles, UserType } from "../atoms/auth";
 
 const Login = lazy(() => import("../pages/login"));

@@ -7,6 +7,8 @@ export const UserRoles = [
   "SUPER_ADMIN",
 ] as const;
 
+export const allowedUserRolesToAssign = UserRoles.slice(0, 3);
+
 export const roles = {
   trainee: UserRoles[0],
   trainer: UserRoles[1],

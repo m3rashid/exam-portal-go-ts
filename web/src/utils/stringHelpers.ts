@@ -1,4 +1,7 @@
 export const makeFirstCapital = (s: string) => {
-  s = s.toLowerCase();
-  return s.charAt(0).toUpperCase() + s.slice(1);
+  return s
+    .toLowerCase()
+    .split("_")
+    .map((r) => r.charAt(0).toUpperCase() + r.slice(1))
+    .join(" ");
 };
