@@ -8,7 +8,7 @@ import { localStorageKeys } from "../layout/localStorage";
 import { LoginInput, RegisterInput } from "../types/auth";
 import { authRoutes } from "../api/backendRouteConstants";
 import { authState, defaultAuthState } from "../atoms/auth";
-import { generalRoutes } from "../api/frontendRouteConstants";
+import { generalUnauthenticatedRoutes } from "../api/frontendRouteConstants";
 
 const useAuth = () => {
   const navigate = useNavigate();
@@ -47,12 +47,14 @@ const useAuth = () => {
   const $logout = async () => {
     try {
       const { data } = await instance.post(authRoutes.logout, {});
-      message.success(data.status);
-      setAuth({ ...defaultAuthState, loading: false });
       window.localStorage.removeItem(localStorageKeys.token);
+      instance.defaults.headers.common["Authorization"] = "";
+      setAuth({ ...defaultAuthState, loading: false });
+      message.success(data.status);
     } catch (err) {
       $afterFailure(err);
-      navigate(generalRoutes.home);
+    } finally {
+      navigate(generalUnauthenticatedRoutes.login);
     }
   };
 

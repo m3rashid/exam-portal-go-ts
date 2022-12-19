@@ -4,17 +4,22 @@ import { useNavigate } from "react-router-dom";
 
 import { parentDivStyle } from "../utils/centerEverythinginPage";
 
-interface IProps {}
+interface IProps {
+  text?: string;
+  buttonlabel?: string;
+}
 
-const UnAuthorized: React.FC<IProps> = () => {
+const UnAuthorized: React.FC<IProps> = ({ text, buttonlabel }) => {
   const navigate = useNavigate();
 
   return (
     <div style={parentDivStyle}>
       <Typography.Title level={4} style={{ textAlign: "center" }}>
-        You are not authorized to view this page
+        {text ?? "You are not authorized to view this page"}
       </Typography.Title>
-      <Button onClick={() => navigate("/")}>Back to Home</Button>
+      <Button onClick={() => navigate("/")}>
+        {buttonlabel ?? "Back to Home"}
+      </Button>
     </div>
   );
 };

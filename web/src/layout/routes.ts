@@ -39,15 +39,12 @@ interface Route {
   role: UserType[] | "*";
 }
 
-export const checkAccess = (
-  Auth: AuthState,
-  route: Route,
-  authRequired: boolean
-) => {
-  if (!authRequired) return !Auth.isAuthenticated;
-  if (!Auth.isAuthenticated) return false;
+export const checkAccess = (authState: AuthState, route: Route) => {
   if (route.role === "*") return true;
-  const userType = Auth.userType;
+  if (route.role.length === 0 && !authState.isAuthenticated) return true;
+  if (!authState.isAuthenticated) return false;
+
+  const userType = authState.userType;
   if (!userType) return false;
   return route.role.some((role) => userType.includes(role));
 };

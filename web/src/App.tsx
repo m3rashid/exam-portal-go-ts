@@ -4,13 +4,13 @@ import { Route, Routes } from "react-router-dom";
 import { lazy, Suspense, useEffect } from "react";
 
 import instance from "./api/instance";
+import useAuth from "./hooks/useAuth";
 import RootWrapper from "./layout/root";
+import NotFound from "./pages/notFound";
 import { authState } from "./atoms/auth";
 import { checkAccess, routes } from "./layout/routes";
 import FullPageLoading from "./layout/fullPageLoading";
 import { generalRoutes } from "./api/frontendRouteConstants";
-import NotFound from "./pages/notFound";
-import useAuth from "./hooks/useAuth";
 
 const Home = lazy(() => import("./pages/home"));
 const About = lazy(() => import("./pages/about"));
@@ -40,9 +40,8 @@ const App = () => {
       <Suspense fallback={<FullPageLoading />}>
         <Routes>
           {routes.map((route, index) => {
-            const isNoAuthRequiredRoute = checkAccess(auth, route, false);
-            const isAuthRequiredRoute = checkAccess(auth, route, true);
-            if (isNoAuthRequiredRoute) {
+            const authPassedRoute = checkAccess(auth, route);
+            if (authPassedRoute) {
               return (
                 <Route
                   path={route.path}
@@ -52,20 +51,17 @@ const App = () => {
               );
             }
 
-            if (!isAuthRequiredRoute) {
-              return (
-                <Route
-                  path="*"
-                  element={<UnAuthorized />}
-                  key={`route ${index} ${route.path}`}
-                />
-              );
-            }
-
             return (
               <Route
-                path={route.path}
-                element={<route.component />}
+                path="*"
+                element={
+                  <UnAuthorized
+                    {...(auth.isAuthenticated && {
+                      text: "You are already Logged in",
+                      buttonlabel: "Back to Home",
+                    })}
+                  />
+                }
                 key={`route ${index} ${route.path}`}
               />
             );
